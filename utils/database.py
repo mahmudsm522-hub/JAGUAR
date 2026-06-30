@@ -1,5 +1,4 @@
 import sqlite3
-import sqlite3
 from pathlib import Path
 
 # Create data folder if it doesn't exist
