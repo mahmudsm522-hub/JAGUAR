@@ -59,3 +59,74 @@ CREATE TABLE IF NOT EXISTS withdraws(
 """)
 
 db.commit()
+from datetime import datetime
+
+
+# ==========================
+# CREATE USER
+# ==========================
+def create_user(user_id, username, first_name):
+
+    cursor.execute(
+        "SELECT user_id FROM users WHERE user_id = ?",
+        (user_id,)
+    )
+
+    user = cursor.fetchone()
+
+    if user:
+        return False
+
+    cursor.execute("""
+        INSERT INTO users(
+            user_id,
+            username,
+            first_name,
+            balance,
+            referrals,
+            joined_date
+        )
+        VALUES(?, ?, ?, ?, ?, ?)
+    """, (
+        user_id,
+        username,
+        first_name,
+        100,   # Welcome Bonus
+        0,
+        datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    ))
+
+    db.commit()
+
+    return True
+
+
+# ==========================
+# GET USER
+# ==========================
+def get_user(user_id):
+
+    cursor.execute(
+        "SELECT * FROM users WHERE user_id=?",
+        (user_id,)
+    )
+
+    return cursor.fetchone()
+
+
+# ==========================
+# GET BALANCE
+# ==========================
+def get_balance(user_id):
+
+    cursor.execute(
+        "SELECT balance FROM users WHERE user_id=?",
+        (user_id,)
+    )
+
+    result = cursor.fetchone()
+
+    if result:
+        return result[0]
+
+    return 0
