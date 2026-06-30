@@ -1,5 +1,96 @@
 import sqlite3
+import sqlite3
+from pathlib import Path
 
+# Create data folder if it doesn't exist
+Path("data").mkdir(exist_ok=True)
+
+# Connect database
+conn = sqlite3.connect("data/jaguar.db", check_same_thread=False)
+cursor = conn.cursor()
+
+
+def init_database():
+    # Users
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS users(
+        user_id INTEGER PRIMARY KEY,
+        username TEXT,
+        first_name TEXT,
+        balance INTEGER DEFAULT 500,
+        referrals INTEGER DEFAULT 0,
+        joined_date TEXT,
+        last_daily TEXT,
+        wallet_verified INTEGER DEFAULT 0,
+        banned INTEGER DEFAULT 0,
+        rank TEXT DEFAULT 'Beginner'
+    )
+    """)
+
+    # Tasks
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS tasks(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT,
+        type TEXT,
+        link TEXT,
+        reward INTEGER,
+        status INTEGER DEFAULT 1
+    )
+    """)
+
+    # Completed Tasks
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS completed_tasks(
+        user_id INTEGER,
+        task_id INTEGER,
+        completed_at TEXT
+    )
+    """)
+
+    # Referrals
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS referrals(
+        referrer_id INTEGER,
+        new_user_id INTEGER,
+        reward INTEGER,
+        date TEXT
+    )
+    """)
+
+    # Withdraws
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS withdraws(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        wallet TEXT,
+        amount INTEGER,
+        status TEXT,
+        date TEXT
+    )
+    """)
+
+    # Settings
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS settings(
+        key TEXT PRIMARY KEY,
+        value TEXT
+    )
+    """)
+
+    # Transactions
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS transactions(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        type TEXT,
+        amount INTEGER,
+        description TEXT,
+        date TEXT
+    )
+    """)
+
+    conn.commit()
 db = sqlite3.connect("data/jaguar.db", check_same_thread=False)
 cursor = db.cursor()
 
@@ -130,3 +221,4 @@ def get_balance(user_id):
         return result[0]
 
     return 0
+init_database()
