@@ -61,3 +61,20 @@ async def wallet_type_selected(
     )
 
     await callback.answer()
+@router.message(WithdrawState.waiting_wallet_address)
+async def wallet_address(
+    message: Message,
+    state: FSMContext
+):
+
+    await state.update_data(
+        wallet_address=message.text
+    )
+
+    await state.set_state(
+        WithdrawState.waiting_amount
+    )
+
+    await message.answer(
+        "💰 Enter withdrawal amount (JGR)."
+    )
