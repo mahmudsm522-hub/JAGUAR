@@ -221,3 +221,50 @@ def get_balance(user_id):
 
     return 0
 init_database()
+from datetime import datetime
+
+
+def get_daily(user_id):
+    cursor.execute(
+        "SELECT last_claim, streak FROM daily_rewards WHERE user_id=?",
+        (user_id,)
+    )
+    return cursor.fetchone()
+
+
+def save_daily(user_id, last_claim, streak):
+
+    cursor.execute(
+        "SELECT user_id FROM daily_rewards WHERE user_id=?",
+        (user_id,)
+    )
+
+    if cursor.fetchone():
+
+        cursor.execute("""
+        UPDATE daily_rewards
+        SET last_claim=?,
+            streak=?
+        WHERE user_id=?
+        """, (
+            last_claim,
+            streak,
+            user_id
+        ))
+
+    else:
+
+        cursor.execute("""
+        INSERT INTO daily_rewards(
+            user_id,
+            last_claim,
+            streak
+        )
+        VALUES(?,?,?)
+        """, (
+            user_id,
+            last_claim,
+            streak
+        ))
+
+    conn.commit()
