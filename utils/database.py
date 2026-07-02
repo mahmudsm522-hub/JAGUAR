@@ -332,3 +332,13 @@ def get_user(user_id):
     )
 
     return cursor.fetchone()
+def get_active_tasks():
+
+    cursor.execute("""
+    SELECT *
+    FROM tasks
+    WHERE status=1
+    ORDER BY id ASC
+    """)
+
+    return cursor.fetchall()
