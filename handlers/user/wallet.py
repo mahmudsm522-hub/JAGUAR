@@ -121,7 +121,46 @@ async def withdraw_amount(
         wallet_address=data["wallet_address"],
         amount=amount
     )
+keyboard = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(
+                text="✅ Approve",
+                callback_data=f"approve_{message.from_user.id}"
+            ),
+            InlineKeyboardButton(
+                text="❌ Reject",
+                callback_data=f"reject_{message.from_user.id}"
+            )
+        ]
+    ]
+)
 
+await message.bot.send_message(
+    ADMIN_ID,
+    f"""
+💸 <b>New Withdrawal Request</b>
+
+👤 User:
+@{message.from_user.username}
+
+🆔 ID:
+<code>{message.from_user.id}</code>
+
+💳 Wallet Type:
+{data['wallet_type']}
+
+🏦 Wallet:
+<code>{data['wallet_address']}</code>
+
+💰 Amount:
+<b>{amount} JGR</b>
+
+Status:
+⏳ Pending
+""",
+    reply_markup=keyboard
+)
     await state.clear()
 
     await message.answer(
