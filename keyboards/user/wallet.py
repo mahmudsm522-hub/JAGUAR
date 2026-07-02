@@ -1,5 +1,11 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
+withdraw_id = create_withdraw(
+    user_id=message.from_user.id,
+    wallet_type=data["wallet_type"],
+    wallet_address=data["wallet_address"],
+    amount=amount
+)
 wallet_keyboard = InlineKeyboardMarkup(
     inline_keyboard=[
         [
