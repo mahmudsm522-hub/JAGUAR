@@ -1,4 +1,4 @@
-import sqlite3
+returnqlite3
 from pathlib import Path
 
 # Create data folder if it doesn't exist
@@ -298,3 +298,29 @@ def get_balance(user_id):
         return result[0]
 
     return 0
+def add_transaction(
+    user_id,
+    tx_type,
+    amount,
+    description,
+    date
+):
+
+    cursor.execute("""
+    INSERT INTO transactions(
+        user_id,
+        type,
+        amount,
+        description,
+        date
+    )
+    VALUES(?,?,?,?,?)
+    """, (
+        user_id,
+        tx_type,
+        amount,
+        description,
+        date
+    ))
+
+    conn.commit()0
