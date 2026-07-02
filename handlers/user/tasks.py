@@ -29,3 +29,34 @@ async def tasks_menu(message: Message):
     text += "\n👇 Select a task below."
 
     await message.answer(text)
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+
+...
+
+for task in tasks:
+
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="📂 Open",
+                    url=task[3]
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="✅ Verify",
+                    callback_data=f"verify_{task[0]}"
+                )
+            ]
+        ]
+    )
+
+    await message.answer(
+        f"""
+📌 <b>{task[1]}</b>
+
+💰 Reward: {task[4]} JGR
+""",
+        reply_markup=keyboard
+    )
