@@ -49,3 +49,15 @@ def is_admin(user_id):
     from bot.config import ADMINS
 
     return user_id in ADMINS
+async def check_membership(bot, chat_id, user_id):
+    try:
+        member = await bot.get_chat_member(chat_id, user_id)
+
+        return member.status in (
+            "member",
+            "administrator",
+            "creator"
+        )
+
+    except Exception:
+        return False
