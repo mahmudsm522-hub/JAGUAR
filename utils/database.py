@@ -430,3 +430,13 @@ def update_withdraw_status(withdraw_id, status):
         WHERE id=?
     """, (status, withdraw_id))
     conn.commit()
+def update_withdraw_status(withdraw_id, status):
+    cursor.execute(
+        """
+        UPDATE withdraws
+        SET status=?
+        WHERE id=?
+        """,
+        (status, withdraw_id)
+    )
+    conn.commit()
