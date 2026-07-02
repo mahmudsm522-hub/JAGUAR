@@ -10,7 +10,7 @@ from bot.config import BOT_TOKEN
 from handlers.start import router as start_router
 from handlers.menu import router as menu_router
 from handlers.user.daily import router as daily_router
-
+from handlers.user.profile import router as profile_router
 async def main():
 
     bot = Bot(
@@ -25,7 +25,8 @@ async def main():
     # Register Routers
     dp.include_router(start_router)
     dp.include_router(menu_router)
- dp.include_router(daily_router)
+    dp.include_router(daily_router)
+    dp.include_router(profile_router)
     print("🐆 Jaguar Bot Started Successfully!")
 
     await dp.start_polling(bot)
