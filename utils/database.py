@@ -324,3 +324,11 @@ def add_transaction(
     ))
 
     conn.commit()0
+def get_user(user_id):
+
+    cursor.execute(
+        "SELECT * FROM users WHERE user_id=?",
+        (user_id,)
+    )
+
+    return cursor.fetchone()
