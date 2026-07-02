@@ -444,3 +444,10 @@ def get_withdraw(withdraw_id):
         (withdraw_id,)
     )
     return cursor.fetchone()
+def get_all_users():
+
+    cursor.execute(
+        "SELECT user_id FROM users"
+    )
+
+    return cursor.fetchall()
