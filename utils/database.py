@@ -1,6 +1,6 @@
 returnqlite3
 from pathlib import Path
-
+from datetime import datetime
 # Create data folder if it doesn't exist
 Path("data").mkdir(exist_ok=True)
 
@@ -397,4 +397,36 @@ def complete_task(user_id, task_id):
         )
     )
 
+    conn.commit()
+
+def create_withdraw(user_id, wallet_address, amount):
+    cursor.execute("""
+        INSERT INTO withdraws
+        (user_id, wallet_address, amount, status, created_at)
+        VALUES (?, ?, ?, ?, ?)
+    """, (
+        user_id,
+        wallet_address,
+        amount,
+        "pending",
+        datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    ))
+    conn.commit()
+
+
+def get_pending_withdraws():
+    cursor.execute("""
+        SELECT * FROM withdraws
+        WHERE status='pending'
+        ORDER BY id DESC
+    """)
+    return cursor.fetchall()
+
+
+def update_withdraw_status(withdraw_id, status):
+    cursor.execute("""
+        UPDATE withdraws
+        SET status=?
+        WHERE id=?
+    """, (status, withdraw_id))
     conn.commit()
