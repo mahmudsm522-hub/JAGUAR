@@ -82,3 +82,53 @@ async def wallet_address(
     await message.answer(
         "💰 Enter withdrawal amount (JGR)."
     )
+@router.message(WithdrawState.waiting_amount)
+async def withdraw_amount(
+    message: Message,
+    state: FSMContext
+):
+
+    if not message.text.isdigit():
+
+        await message.answer(
+            "❌ Please enter numbers only."
+        )
+        return
+
+    amount = int(message.text)
+
+    if amount < 10000:
+
+        await message.answer(
+            "❌ Minimum withdrawal is 10,000 JGR."
+        )
+        return
+
+    balance = get_balance(message.from_user.id)
+
+    if amount > balance:
+
+        await message.answer(
+            "❌ Insufficient balance."
+        )
+        return
+
+    data = await state.get_data()
+
+    create_withdraw(
+        user_id=message.from_user.id,
+        wallet_address=data["wallet_address"],
+        amount=amount
+    )
+
+    await state.clear()
+
+    await message.answer(
+        f"""
+✅ Withdrawal request submitted.
+
+💰 Amount: {amount} JGR
+
+⏳ Status: Pending Admin Approval.
+"""
+)
