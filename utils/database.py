@@ -99,3 +99,66 @@ def init_database():
         date TEXT
     )
     """)
+# ----------------------
+    # WITHDRAWS
+    # ----------------------
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS withdraws(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        wallet_type TEXT,
+        wallet_address TEXT,
+        amount INTEGER,
+        status TEXT DEFAULT 'pending',
+        created_at TEXT,
+        approved_at TEXT,
+        approved_by INTEGER
+    )
+    """)
+
+    # ----------------------
+    # TRANSACTIONS
+    # ----------------------
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS transactions(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        type TEXT,
+        amount INTEGER,
+        description TEXT,
+        date TEXT
+    )
+    """)
+
+    # ----------------------
+    # SETTINGS
+    # ----------------------
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS settings(
+        key TEXT PRIMARY KEY,
+        value TEXT
+    )
+    """)
+
+    # ----------------------
+    # PREMIUM LOGS
+    # ----------------------
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS premium_logs(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        admin_id INTEGER,
+        duration INTEGER,
+        created_at TEXT
+    )
+    """)
+
+    conn.commit()
+
+
+# Initialize database
+init_database()
