@@ -342,3 +342,20 @@ def get_active_tasks():
     """)
 
     return cursor.fetchall()
+def add_task(title, task_type, link, reward):
+
+    cursor.execute(
+        """
+        INSERT INTO tasks
+        (title, type, link, reward)
+        VALUES (?, ?, ?, ?)
+        """,
+        (
+            title,
+            task_type,
+            link,
+            reward
+        )
+    )
+
+    conn.commit()
