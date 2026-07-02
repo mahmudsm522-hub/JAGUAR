@@ -438,3 +438,9 @@ def update_withdraw_status(withdraw_id, status):
         (status, withdraw_id)
     )
     conn.commit()
+def get_withdraw(withdraw_id):
+    cursor.execute(
+        "SELECT * FROM withdraws WHERE id=?",
+        (withdraw_id,)
+    )
+    return cursor.fetchone()
