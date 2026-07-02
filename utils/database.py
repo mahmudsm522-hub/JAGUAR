@@ -359,3 +359,42 @@ def add_task(title, task_type, link, reward):
     )
 
     conn.commit()
+def get_task(task_id):
+    cursor.execute(
+        "SELECT * FROM tasks WHERE id=? AND status=1",
+        (task_id,)
+    )
+    return cursor.fetchone()
+
+
+def is_task_completed(user_id, task_id):
+    cursor.execute(
+        """
+        SELECT 1 FROM completed_tasks
+        WHERE user_id=? AND task_id=?
+        """,
+        (user_id, task_id)
+    )
+    return cursor.fetchone() is not None
+
+
+def complete_task(user_id, task_id):
+    from datetime import datetime
+
+    cursor.execute(
+        """
+        INSERT INTO completed_tasks(
+            user_id,
+            task_id,
+            completed_at
+        )
+        VALUES(?,?,?)
+        """,
+        (
+            user_id,
+            task_id,
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        )
+    )
+
+    conn.commit()
