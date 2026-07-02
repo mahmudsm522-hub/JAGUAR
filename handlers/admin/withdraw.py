@@ -1,6 +1,9 @@
 from aiogram import Router, F
 from aiogram.types import CallbackQuery
-
+from utils.database import (
+    get_withdraw,
+    update_withdraw_status
+)
 router = Router()
 
 
@@ -32,3 +35,14 @@ async def reject(callback: CallbackQuery):
     )
 
     await callback.answer()
+withdraw_id = int(callback.data.split("_")[1])
+
+withdraw = get_withdraw(withdraw_id)
+
+if not withdraw:
+    await callback.answer("Request not found.")
+    return
+
+update_withdraw_status(withdraw_id, "approved")
+
+user_id = withdraw[1]
