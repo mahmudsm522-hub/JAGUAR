@@ -155,27 +155,25 @@ from datetime import datetime
 # ==========================
 # CREATE USER
 # ==========================
-def create_user(user_id, username, first_name):
+from datetime import datetime
 
-    cursor.execute(
-        "SELECT user_id FROM users WHERE user_id = ?",
-        (user_id,)
-    )
-
-    user = cursor.fetchone()
-
-    if user:
-        return False
-
+def create_withdraw(user_id, wallet_type, wallet_address, amount):
     cursor.execute("""
-        INSERT INTO users(
-            user_id,
-            username,
-            first_name,
-            balance,
-            referrals,
-            joined_date
-        )
+        INSERT INTO withdraws
+        (user_id, wallet_type, wallet_address, amount, status, created_at)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """, (
+        user_id,
+        wallet_type,
+        wallet_address,
+        amount,
+        "pending",
+        datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    ))
+
+    conn.commit()
+
+    return cursor.lastrowid
         VALUES(?, ?, ?, ?, ?, ?)
     """, (
         user_id,
