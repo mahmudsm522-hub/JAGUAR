@@ -42,3 +42,22 @@ async def withdraw_menu(callback: CallbackQuery):
     )
 
     await callback.answer()
+@router.callback_query(F.data.startswith("wallet_"))
+async def wallet_type_selected(
+    callback: CallbackQuery,
+    state: FSMContext
+):
+
+    wallet_type = callback.data.replace("wallet_", "")
+
+    await state.update_data(wallet_type=wallet_type)
+
+    await state.set_state(
+        WithdrawState.waiting_wallet_address
+    )
+
+    await callback.message.answer(
+        "📥 Send your wallet address (or Binance UID)."
+    )
+
+    await callback.answer()
