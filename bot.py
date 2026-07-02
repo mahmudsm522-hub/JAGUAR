@@ -13,6 +13,7 @@ from handlers.user.daily import router as daily_router
 from handlers.user.profile import router as profile_router
 from handlers.admin.tasks import router as admin_tasks_router
 from handlers.admin.withdraw import router as withdraw_router
+from handlers.admin.broadcast import router as broadcast_router
 async def main():
     bot = Bot(
         token=BOT_TOKEN,
@@ -30,6 +31,7 @@ async def main():
     dp.include_router(profile_router)
     dp.include_router(admin_tasks_router)
     dp.include_router(withdraw_router)
+    dp.include_router(broadcast_router)
     print("🐆 Jaguar Bot Started Successfully!")
 
     await dp.start_polling(bot)
