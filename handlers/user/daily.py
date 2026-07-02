@@ -27,81 +27,75 @@ REWARDS = {
 
 @router.message(F.text == "🎁 Daily Reward")
 async def daily_reward(message: Message):
-
     user_id = message.from_user.id
-
-    today = datetime.now()
+    now = datetime.now()
 
     daily = get_daily(user_id)
 
-    # First Claim
     if daily is None:
-
         streak = 1
-        reward = REWARDS[1]
 
     else:
-
-        last_claim = datetime.strptime(
-            daily[0],
-            "%Y-%m-%d %H:%M:%S"
-        )
-
-        streak = daily[1]
-
-        # Already claimed today
-        if last_claim.date() == today.date():
-
-            await message.answer(
-                "⏳ You already claimed today's reward.\n\nCome back tomorrow."
+        try:
+            last_claim = datetime.strptime(
+                daily[0],
+                "%Y-%m-%d %H:%M:%S"
             )
-            return
 
-        # Continue streak
-        if today.date() == (last_claim + timedelta(days=1)).date():
+            streak = daily[1]
 
-            streak += 1
+            # Already claimed today
+            if last_claim.date() == now.date():
+                await message.answer(
+                    "⏳ You have already claimed today's reward.\n\n"
+                    "Please come back tomorrow."
+                )
+                return
 
-            if streak > 7:
+            # Continue streak
+            if (now.date() - last_claim.date()).days == 1:
+                streak += 1
+                if streak > 7:
+                    streak = 1
+            else:
                 streak = 1
 
-        else:
+        except Exception:
             streak = 1
 
-        reward = REWARDS[streak]
+    reward = REWARDS[streak]
 
-    # Save Daily
+    # Save daily reward
     save_daily(
         user_id,
-        today.strftime("%Y-%m-%d %H:%M:%S"),
+        now.strftime("%Y-%m-%d %H:%M:%S"),
         streak
     )
 
-    # Add Balance
-    add_balance(
-        user_id,
-        reward
-    )
+    # Add reward
+    add_balance(user_id, reward)
 
-    # Save Transaction
+    # Save transaction
     add_transaction(
-        user_id,
-        "daily_reward",
-        reward,
-        f"Day {streak} Daily Reward",
-        today.strftime("%Y-%m-%d %H:%M:%S")
+        user_id=user_id,
+        tx_type="daily_reward",
+        amount=reward,
+        description=f"Daily Reward - Day {streak}",
+        date=now.strftime("%Y-%m-%d %H:%M:%S")
     )
 
     balance = get_balance(user_id)
 
     await message.answer(
         f"""
-🎁 <b>Daily Reward Claimed!</b>
+🎉 <b>Daily Reward Claimed!</b>
 
 🪙 Reward: <b>+{reward} JGR</b>
 
-🔥 Streak: <b>Day {streak}</b>
+🔥 Streak: <b>Day {streak}/7</b>
 
 💰 Balance: <b>{balance} JGR</b>
+
+Come back tomorrow for a bigger reward!
 """
-)
+                )
