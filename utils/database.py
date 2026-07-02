@@ -268,3 +268,33 @@ def save_daily(user_id, last_claim, streak):
         ))
 
     conn.commit()
+def add_balance(user_id, amount):
+
+    cursor.execute("""
+    UPDATE users
+    SET balance = balance + ?
+    WHERE user_id = ?
+    """, (
+        amount,
+        user_id
+    ))
+
+    conn.commit()
+
+
+def get_balance(user_id):
+
+    cursor.execute("""
+    SELECT balance
+    FROM users
+    WHERE user_id=?
+    """, (
+        user_id,
+    ))
+
+    result = cursor.fetchone()
+
+    if result:
+        return result[0]
+
+    return 0
