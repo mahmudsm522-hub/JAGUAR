@@ -745,3 +745,149 @@ def get_total_withdraw_amount():
     """)
 
     return cursor.fetchone()[0]
+# ==========================
+# STATISTICS
+# ==========================
+
+def get_total_users():
+
+    cursor.execute("""
+    SELECT COUNT(*)
+    FROM users
+    """)
+
+    return cursor.fetchone()[0]
+
+
+def get_total_tasks():
+
+    cursor.execute("""
+    SELECT COUNT(*)
+    FROM tasks
+    """)
+
+    return cursor.fetchone()[0]
+
+
+def get_total_referrals():
+
+    cursor.execute("""
+    SELECT COALESCE(SUM(referrals),0)
+    FROM users
+    """)
+
+    return cursor.fetchone()[0]
+
+
+def get_total_balance():
+
+    cursor.execute("""
+    SELECT COALESCE(SUM(balance),0)
+    FROM users
+    """)
+
+    return cursor.fetchone()[0]
+
+
+def get_today_users():
+
+    today = datetime.now().strftime("%Y-%m-%d")
+
+    cursor.execute("""
+    SELECT COUNT(*)
+    FROM users
+    WHERE joined_date LIKE ?
+    """, (f"{today}%",))
+
+    return cursor.fetchone()[0]
+
+
+def get_premium_users():
+
+    cursor.execute("""
+    SELECT COUNT(*)
+    FROM users
+    WHERE premium=1
+    """)
+
+    return cursor.fetchone()[0]
+
+
+# ==========================
+# LEADERBOARD
+# ==========================
+
+def get_top_balance(limit=10):
+
+    cursor.execute("""
+    SELECT
+        user_id,
+        username,
+        first_name,
+        balance
+    FROM users
+    ORDER BY balance DESC
+    LIMIT ?
+    """, (limit,))
+
+    return cursor.fetchall()
+
+
+def get_top_referrals(limit=10):
+
+    cursor.execute("""
+    SELECT
+        user_id,
+        username,
+        first_name,
+        referrals
+    FROM users
+    ORDER BY referrals DESC
+    LIMIT ?
+    """, (limit,))
+
+    return cursor.fetchall()
+
+
+# ==========================
+# SETTINGS
+# ==========================
+
+def set_setting(key, value):
+
+    cursor.execute("""
+    INSERT OR REPLACE INTO settings(
+        key,
+        value
+    )
+    VALUES(?,?)
+    """, (
+        key,
+        str(value)
+    ))
+
+    conn.commit()
+
+
+def get_setting(key, default=None):
+
+    cursor.execute("""
+    SELECT value
+    FROM settings
+    WHERE key=?
+    """, (key,))
+
+    result = cursor.fetchone()
+
+    if result:
+        return result["value"]
+
+    return default
+
+
+# ==========================
+# DATABASE CLOSE
+# ==========================
+
+def close_database():
+    conn.close()
