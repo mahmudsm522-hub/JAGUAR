@@ -613,3 +613,135 @@ def get_completed_tasks(user_id):
     """, (user_id,))
 
     return cursor.fetchall()
+# ==========================
+# WITHDRAW SYSTEM
+# ==========================
+
+def create_withdraw(
+    user_id,
+    wallet_type,
+    wallet_address,
+    amount
+):
+
+    cursor.execute("""
+    INSERT INTO withdraws(
+        user_id,
+        wallet_type,
+        wallet_address,
+        amount,
+        status,
+        created_at
+    )
+    VALUES(?,?,?,?,?,?)
+    """, (
+        user_id,
+        wallet_type,
+        wallet_address,
+        amount,
+        "pending",
+        datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    ))
+
+    conn.commit()
+
+    return cursor.lastrowid
+
+
+def get_withdraw(withdraw_id):
+
+    cursor.execute("""
+    SELECT *
+    FROM withdraws
+    WHERE id=?
+    """, (withdraw_id,))
+
+    return cursor.fetchone()
+
+
+def get_user_withdraws(user_id):
+
+    cursor.execute("""
+    SELECT *
+    FROM withdraws
+    WHERE user_id=?
+    ORDER BY id DESC
+    """, (user_id,))
+
+    return cursor.fetchall()
+
+
+def get_pending_withdraws():
+
+    cursor.execute("""
+    SELECT *
+    FROM withdraws
+    WHERE status='pending'
+    ORDER BY id ASC
+    """)
+
+    return cursor.fetchall()
+
+
+def approve_withdraw(
+    withdraw_id,
+    admin_id
+):
+
+    cursor.execute("""
+    UPDATE withdraws
+    SET
+        status='approved',
+        approved_at=?,
+        approved_by=?
+    WHERE id=?
+    """, (
+        datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        admin_id,
+        withdraw_id
+    ))
+
+    conn.commit()
+
+
+def reject_withdraw(
+    withdraw_id,
+    admin_id
+):
+
+    cursor.execute("""
+    UPDATE withdraws
+    SET
+        status='rejected',
+        approved_at=?,
+        approved_by=?
+    WHERE id=?
+    """, (
+        datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        admin_id,
+        withdraw_id
+    ))
+
+    conn.commit()
+
+
+def get_withdraw_count(status):
+
+    cursor.execute("""
+    SELECT COUNT(*)
+    FROM withdraws
+    WHERE status=?
+    """, (status,))
+
+    return cursor.fetchone()[0]
+
+
+def get_total_withdraw_amount():
+
+    cursor.execute("""
+    SELECT COALESCE(SUM(amount),0)
+    FROM withdraws
+    WHERE status='approved'
+    """)
+
+    return cursor.fetchone()[0]
