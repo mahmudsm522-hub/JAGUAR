@@ -478,3 +478,138 @@ def is_banned(user_id):
         return bool(result["banned"])
 
     return False
+# ==========================
+# TASKS
+# ==========================
+
+def add_task(title, task_type, link, reward):
+
+    cursor.execute("""
+    INSERT INTO tasks(
+        title,
+        task_type,
+        link,
+        reward,
+        status,
+        created_at
+    )
+    VALUES(?,?,?,?,?,?)
+    """, (
+        title,
+        task_type,
+        link,
+        reward,
+        1,
+        datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    ))
+
+    conn.commit()
+
+    return cursor.lastrowid
+
+
+def get_active_tasks():
+
+    cursor.execute("""
+    SELECT *
+    FROM tasks
+    WHERE status=1
+    ORDER BY id DESC
+    """)
+
+    return cursor.fetchall()
+
+
+def get_task(task_id):
+
+    cursor.execute("""
+    SELECT *
+    FROM tasks
+    WHERE id=?
+    """, (task_id,))
+
+    return cursor.fetchone()
+
+
+def delete_task(task_id):
+
+    cursor.execute("""
+    DELETE FROM tasks
+    WHERE id=?
+    """, (task_id,))
+
+    conn.commit()
+
+
+def disable_task(task_id):
+
+    cursor.execute("""
+    UPDATE tasks
+    SET status=0
+    WHERE id=?
+    """, (task_id,))
+
+    conn.commit()
+
+
+def enable_task(task_id):
+
+    cursor.execute("""
+    UPDATE tasks
+    SET status=1
+    WHERE id=?
+    """, (task_id,))
+
+    conn.commit()
+
+
+# ==========================
+# COMPLETED TASKS
+# ==========================
+
+def is_task_completed(user_id, task_id):
+
+    cursor.execute("""
+    SELECT id
+    FROM completed_tasks
+    WHERE user_id=? AND task_id=?
+    """, (
+        user_id,
+        task_id
+    ))
+
+    return cursor.fetchone() is not None
+
+
+def complete_task(user_id, task_id):
+
+    if is_task_completed(user_id, task_id):
+        return False
+
+    cursor.execute("""
+    INSERT INTO completed_tasks(
+        user_id,
+        task_id,
+        completed_at
+    )
+    VALUES(?,?,?)
+    """, (
+        user_id,
+        task_id,
+        datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    ))
+
+    conn.commit()
+
+    return True
+
+
+def get_completed_tasks(user_id):
+
+    cursor.execute("""
+    SELECT task_id
+    FROM completed_tasks
+    WHERE user_id=?
+    """, (user_id,))
+
+    return cursor.fetchall()
