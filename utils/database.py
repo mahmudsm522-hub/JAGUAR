@@ -162,3 +162,146 @@ def init_database():
 
 # Initialize database
 init_database()
+# ==========================
+# USERS
+# ==========================
+
+def user_exists(user_id):
+    cursor.execute(
+        "SELECT 1 FROM users WHERE user_id=?",
+        (user_id,)
+    )
+    return cursor.fetchone() is not None
+
+
+def create_user(user_id, username, first_name):
+
+    if user_exists(user_id):
+        return False
+
+    cursor.execute("""
+    INSERT INTO users(
+        user_id,
+        username,
+        first_name,
+        balance,
+        referrals,
+        joined_date
+    )
+    VALUES(?,?,?,?,?,?)
+    """, (
+        user_id,
+        username,
+        first_name,
+        100,
+        0,
+        datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    ))
+
+    conn.commit()
+
+    return True
+
+
+def get_user(user_id):
+
+    cursor.execute(
+        "SELECT * FROM users WHERE user_id=?",
+        (user_id,)
+    )
+
+    return cursor.fetchone()
+
+
+def get_all_users():
+
+    cursor.execute(
+        "SELECT user_id FROM users"
+    )
+
+    return cursor.fetchall()
+
+
+def get_balance(user_id):
+
+    cursor.execute(
+        "SELECT balance FROM users WHERE user_id=?",
+        (user_id,)
+    )
+
+    result = cursor.fetchone()
+
+    if result:
+        return result["balance"]
+
+    return 0
+
+
+def add_balance(user_id, amount):
+
+    cursor.execute("""
+    UPDATE users
+    SET balance = balance + ?
+    WHERE user_id=?
+    """, (
+        amount,
+        user_id
+    ))
+
+    conn.commit()
+
+
+def remove_balance(user_id, amount):
+
+    cursor.execute("""
+    UPDATE users
+    SET balance = balance - ?
+    WHERE user_id=?
+    """, (
+        amount,
+        user_id
+    ))
+
+    conn.commit()
+
+
+def update_balance(user_id, balance):
+
+    cursor.execute("""
+    UPDATE users
+    SET balance=?
+    WHERE user_id=?
+    """, (
+        balance,
+        user_id
+    ))
+
+    conn.commit()
+
+
+def add_referral(user_id):
+
+    cursor.execute("""
+    UPDATE users
+    SET referrals = referrals + 1
+    WHERE user_id=?
+    """, (
+        user_id,
+    ))
+
+    conn.commit()
+
+
+def get_referrals(user_id):
+
+    cursor.execute(
+        "SELECT referrals FROM users WHERE user_id=?",
+        (user_id,)
+    )
+
+    result = cursor.fetchone()
+
+    if result:
+        return result["referrals"]
+
+    return 0
