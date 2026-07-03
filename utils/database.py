@@ -305,3 +305,176 @@ def get_referrals(user_id):
         return result["referrals"]
 
     return 0
+# ==========================
+# DAILY REWARD
+# ==========================
+
+def get_daily(user_id):
+
+    cursor.execute("""
+    SELECT last_claim, streak
+    FROM daily_rewards
+    WHERE user_id=?
+    """, (user_id,))
+
+    return cursor.fetchone()
+
+
+def save_daily(user_id, last_claim, streak):
+
+    if get_daily(user_id):
+
+        cursor.execute("""
+        UPDATE daily_rewards
+        SET last_claim=?,
+            streak=?
+        WHERE user_id=?
+        """, (
+            last_claim,
+            streak,
+            user_id
+        ))
+
+    else:
+
+        cursor.execute("""
+        INSERT INTO daily_rewards(
+            user_id,
+            last_claim,
+            streak
+        )
+        VALUES(?,?,?)
+        """, (
+            user_id,
+            last_claim,
+            streak
+        ))
+
+    conn.commit()
+
+
+# ==========================
+# TRANSACTIONS
+# ==========================
+
+def add_transaction(
+    user_id,
+    tx_type,
+    amount,
+    description,
+    date=None
+):
+
+    if date is None:
+        date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    cursor.execute("""
+    INSERT INTO transactions(
+        user_id,
+        type,
+        amount,
+        description,
+        date
+    )
+    VALUES(?,?,?,?,?)
+    """, (
+        user_id,
+        tx_type,
+        amount,
+        description,
+        date
+    ))
+
+    conn.commit()
+
+
+def get_transactions(user_id, limit=20):
+
+    cursor.execute("""
+    SELECT *
+    FROM transactions
+    WHERE user_id=?
+    ORDER BY id DESC
+    LIMIT ?
+    """, (
+        user_id,
+        limit
+    ))
+
+    return cursor.fetchall()
+
+
+# ==========================
+# PREMIUM
+# ==========================
+
+def is_premium(user_id):
+
+    cursor.execute("""
+    SELECT premium
+    FROM users
+    WHERE user_id=?
+    """, (user_id,))
+
+    result = cursor.fetchone()
+
+    if result:
+        return bool(result["premium"])
+
+    return False
+
+
+def set_premium(user_id, status):
+
+    cursor.execute("""
+    UPDATE users
+    SET premium=?
+    WHERE user_id=?
+    """, (
+        int(status),
+        user_id
+    ))
+
+    conn.commit()
+
+
+# ==========================
+# BAN / UNBAN
+# ==========================
+
+def ban_user(user_id):
+
+    cursor.execute("""
+    UPDATE users
+    SET banned=1
+    WHERE user_id=?
+    """, (user_id,))
+
+    conn.commit()
+
+
+def unban_user(user_id):
+
+    cursor.execute("""
+    UPDATE users
+    SET banned=0
+    WHERE user_id=?
+    """, (user_id,))
+
+    conn.commit()
+
+
+def is_banned(user_id):
+
+    cursor.execute("""
+    SELECT banned
+    FROM users
+    WHERE user_id=?
+    """, (user_id,))
+
+    result = cursor.fetchone()
+
+    if result:
+        return bool(result["banned"])
+
+    return False
