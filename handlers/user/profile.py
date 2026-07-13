@@ -3,62 +3,85 @@ from aiogram.types import Message
 
 from utils.database import (
     get_user,
-    get_balance,
-    get_daily
+    get_balance
 )
 
 router = Router()
 
 
+def get_referral_level(referrals: int):
+
+    if referrals >= 250:
+        return "👑 Elite"
+
+    elif referrals >= 100:
+        return "💎 Diamond"
+
+    elif referrals >= 50:
+        return "🥇 Gold"
+
+    elif referrals >= 20:
+        return "🥈 Silver"
+
+    elif referrals >= 5:
+        return "🥉 Bronze"
+
+    return "🌱 Beginner"
+
+
 @router.message(F.text == "👤 Profile")
 async def profile(message: Message):
 
-    user_id = message.from_user.id
-
-    user = get_user(user_id)
+    user = get_user(message.from_user.id)
 
     if not user:
+
         await message.answer(
-            "❌ User not found.\nPlease use /start first."
+            "❌ User not found."
         )
         return
 
-    balance = get_balance(user_id)
+    balance = get_balance(message.from_user.id)
 
-    daily = get_daily(user_id)
+    username = user["username"] or "No Username"
+    first_name = user["first_name"]
+    referrals = user["referrals"]
+    joined = user["joined_date"]
 
-    streak = 0
+    premium = "✅ Active" if user.get("premium", 0) else "❌ Not Active"
 
-    if daily:
-        streak = daily[1]
-
-    username = message.from_user.username
-
-    if username:
-        username = "@" + username
-    else:
-        username = "No Username"
+    level = get_referral_level(referrals)
 
     await message.answer(
         f"""
-👤 <b>YOUR PROFILE</b>
+👤 <b>Your Profile</b>
 
 ━━━━━━━━━━━━━━
 
-🆔 ID: <code>{user_id}</code>
+🆔 <b>ID:</b>
+<code>{message.from_user.id}</code>
 
-👤 Username: {username}
+👤 <b>Name:</b>
+{first_name}
 
-🪙 Balance: <b>{balance} JGR</b>
+📛 <b>Username:</b>
+@{username}
 
-🔥 Daily Streak: <b>{streak}/7</b>
+💰 <b>Balance:</b>
+{balance:,} JGR
 
-🏅 Rank: Beginner
+👥 <b>Referrals:</b>
+{referrals}
 
-👥 Referrals: 0
+🏅 <b>Level:</b>
+{level}
+
+👑 <b>Premium:</b>
+{premium}
+
+📅 <b>Joined:</b>
+{joined}
 
 ━━━━━━━━━━━━━━
-
-🐆 Jaguar v0.2 Alpha
 """
-  )
+)
