@@ -4,19 +4,18 @@ from fastapi import FastAPI, Request
 from aiogram.types import Update
 
 from bot import bot, dp
-from config import BOT_TOKEN
+from config import BOT_TOKEN, RENDER_URL
 
 
 WEBHOOK_PATH = f"/webhook/{BOT_TOKEN}"
-WEBHOOK_URL = f"https://YOUR-RENDER-URL.onrender.com{WEBHOOK_PATH}"
+WEBHOOK_URL = f"{RENDER_URL}{WEBHOOK_PATH}"
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
 
-    # Startup
     await bot.set_webhook(
-        url=WEBHOOK_URL,
+        WEBHOOK_URL,
         drop_pending_updates=True
     )
 
@@ -24,15 +23,15 @@ async def lifespan(app: FastAPI):
 
     yield
 
-    # Shutdown
     await bot.delete_webhook()
     await bot.session.close()
 
-    print("🛑 Bot Stopped")
+    print("🛑 Jaguar Bot Stopped")
 
 
 app = FastAPI(
     title="Jaguar Bot",
+    version="1.0",
     lifespan=lifespan
 )
 
@@ -41,25 +40,20 @@ app = FastAPI(
 async def home():
 
     return {
-        "status": "running",
+        "status": "online",
         "bot": "Jaguar",
         "version": "1.0 Stable"
     }
 
 
 @app.post(WEBHOOK_PATH)
-async def telegram_webhook(request: Request):
+async def webhook(request: Request):
 
     update = Update.model_validate(
         await request.json(),
         context={"bot": bot}
     )
 
-    await dp.feed_update(
-        bot,
-        update
-    )
+    await dp.feed_update(bot, update)
 
-    return {
-        "ok": True
-}
+    return {"ok": True}
