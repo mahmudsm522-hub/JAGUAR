@@ -108,3 +108,8 @@ PREMIUM_TASK_BONUS = 20       # %
 BOT_NAME = "Jaguar Bot"
 BOT_VERSION = "1.0 Stable"
 BOT_CURRENCY = "JGR"
+# ==========================
+# RENDER
+# ==========================
+
+RENDER_URL = os.getenv("RENDER_URL", "")
