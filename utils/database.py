@@ -883,7 +883,24 @@ def get_setting(key, default=None):
         return result["value"]
 
     return default
+def get_referral_level(referrals):
 
+    if referrals >= 250:
+        return "👑 Elite"
+
+    elif referrals >= 100:
+        return "💎 Diamond"
+
+    elif referrals >= 50:
+        return "🥇 Gold"
+
+    elif referrals >= 20:
+        return "🥈 Silver"
+
+    elif referrals >= 5:
+        return "🥉 Bronze"
+
+    return "🌱 Beginner"
 
 # ==========================
 # DATABASE CLOSE
