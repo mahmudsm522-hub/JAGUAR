@@ -2,8 +2,8 @@ from aiogram import Router
 from aiogram.filters import CommandStart
 from aiogram.types import Message
 
+from keyboards.user.menu import main_menu
 from utils.database import create_user
-from keyboards.user.main import main_keyboard
 
 router = Router()
 
@@ -23,12 +23,14 @@ async def start(message: Message):
 
 🐆 Welcome to Jaguar Bot
 
-🎁 Complete tasks
-👥 Invite friends
-💰 Earn JGR
-🏦 Withdraw rewards
+🎁 Earn JGR by:
+• Completing Tasks
+• Daily Rewards
+• Inviting Friends
+
+💸 Minimum Withdraw: <b>10,000 JGR</b>
 
 Choose an option below.
 """,
-        reply_markup=main_keyboard
-  )
+        reply_markup=main_menu
+    )
