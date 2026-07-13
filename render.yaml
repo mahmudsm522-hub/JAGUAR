@@ -3,6 +3,45 @@ services:
     name: jaguar-bot
     runtime: python
 
-    buildCommand: pip install -r requirements.txt
+    buildCommand: |
+      pip install -r requirements.txt
 
-    startCommand: python bot.py
+    startCommand: |
+      uvicorn main:app --host 0.0.0.0 --port $PORT
+
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+
+      - key: ADMIN_ID
+        sync: false
+
+      - key: MAIN_CHANNEL_ID
+        sync: false
+
+      - key: MAIN_CHANNEL_USERNAME
+        sync: false
+
+      - key: MAIN_CHANNEL_LINK
+        sync: false
+
+      - key: WALLET_CHANNEL_ID
+        sync: false
+
+      - key: WALLET_CHANNEL_USERNAME
+        sync: false
+
+      - key: WALLET_CHANNEL_LINK
+        sync: false
+
+      - key: MIN_WITHDRAW
+        value: "10000"
+
+      - key: WELCOME_BONUS
+        value: "100"
+
+      - key: REFERRAL_BONUS
+        value: "500"
+
+      - key: RENDER_URL
+        sync: false
